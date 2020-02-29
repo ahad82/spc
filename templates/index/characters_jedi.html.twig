@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Characters Jedi{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <a href="{{ path('starwars_list') }}">Homepage</a>
+        {% if error %}
+           {{ errorMsg }}
+        {% else %}
+           {% block body %}{% endblock %}
+            <h1>Jedi Characters</h1>
+            <ul>
+                {% for character in result %}
+                    <li>{{ character.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Characters Jedi{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <a href="{{ path('starwars_list') }}">Homepage</a>
+        {% if error %}
+           {{ errorMsg }}
+        {% else %}
+           {% block body %}{% endblock %}
+            <h1>Mammal Species</h1>
+            <ul>
+                {% for specie in result %}
+                    <li>{{ specie.name }} - {{ specie.homeworld }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </body>
+</html>

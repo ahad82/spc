@@ -1,3 +1,11 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+starwars_list:
+    path:       /starwars
+    controller: App\Controller\starwarsController::list
+
+starwars_jedi_characters:
+    path:       /starwars/jedi/characters
+    controller: App\Controller\starwarsController::getJediCharacters
+
+starwars_species_mammal:
+    path:       /starwars/species/mammal
+    controller: App\Controller\starwarsController::getMammalSpecies
