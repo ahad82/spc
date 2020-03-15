@@ -1,6 +1,10 @@
 <?php
 namespace App\Service;
 use Symfony\Component\HttpClient\HttpClient;
+use Doctrine\ORM\EntityManagerInterface;
+
+use App\Entity\SwapiCharacter;
+use App\Entity\UpdatedCharacterData;
 
 class swApi
 {
@@ -18,8 +22,10 @@ class swApi
 		$response = $client->request($method, $url);
 		$statusCode = $response->getStatusCode();
 		
+		$this->log("sending request to swapi for url: {$url}");
 		if ($statusCode != 200) {
-			throw new \Exception ('Failed request for :' . $url);
+			$this->log("Failed request for {$url}");
+			throw new \Exception ("Failed request for {$url}");
 		}
 		// $statusCode = 200
 		$contentType = $response->getHeaders()['content-type'][0];
@@ -72,6 +78,62 @@ class swApi
 		}
 
 		return $species;
+	}
+
+	public function importJediCharacters($em) {
+		$results = $this->getJediCharacters();
+		$results = $this->getHomeWorld($results);
+		
+		foreach ($results as $result) {
+			$character = new SwapiCharacter();
+			$character->name = $result['name'];
+			$character->height = $result['height'];
+			$character->mass = $result['mass'];
+			$character->hairColor = $result['hair_color'];
+			$character->birthYear = $result['birth_year'];
+			
+			$character->gender = $result['gender'];
+			$character->homeworldName = $result['homeworld'];
+			$this->log("getting species now for {$character->name}..");
+			$species = $this->sendRequest($result['species'][0]);
+			$character->speciesName = $species['name'];
+			
+			$em->persist($character);
+			$em->flush();
+		}
+	}
+
+	public function updateCharacters($em) {
+		$fromRepo = $em->getRepository(UpdatedCharacterData::class);
+		$toRepo = $em->getRepository(SwapiCharacter::class);
+		$uchars = $fromRepo->findAll();
+
+		foreach ($uchars as $uchar) {
+			$character = $toRepo->findBy(['name' => $uchar->name]);
+			if (!$character) {
+				$this->log("Character {$uchar->name} not found in current swapi characters");
+				continue;
+			}
+			$character = $character[0];
+			
+			$this->log("Updating {$uchar->name}...");
+			$character->name = $uchar->name;
+			$character->height = $uchar->height;
+			$character->mass = $uchar->mass;
+			$character->hairColor = $uchar->hairColor;
+			$character->birthYear = $uchar->birthYear;
+			$character->gender = $uchar->gender;
+			$character->homeworldName = $uchar->homeworldName;
+			$character->speciesName = $uchar->speciesName;
+
+			$em->persist($character);
+			$em->flush();
+
+		}
+	}
+
+	public function log($msg) {
+		error_log($msg);
 	}
 
 }

@@ -9,3 +9,11 @@ starwars_jedi_characters:
 starwars_species_mammal:
     path:       /starwars/species/mammal
     controller: App\Controller\starwarsController::getMammalSpecies
+
+import_characters:
+    path:       /starwars/characters/import
+    controller: App\Controller\starwarsController::importCharacters
+
+update_characters:
+    path:       /starwars/characters/update
+    controller: App\Controller\starwarsController::updateCharacters
